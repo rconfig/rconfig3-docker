@@ -156,10 +156,10 @@ If you are uncertain about any of the above, the most important items to change 
 
 9. your final output from the previous step should look like this
 
-```sh
-Creating rconfig3-mariadb ... done
-Creating rconfig3-php-apache ... done
-```
+   ```sh
+   Creating rconfig3-mariadb ... done
+   Creating rconfig3-php-apache ... done
+   ```
 
 When troubleshooting issues, the following commands are useful.
 `docker ps -a`
