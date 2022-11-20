@@ -11,13 +11,13 @@ https://github.com/mohammadain/laravel-docker-cron/blob/master/Dockerfile -->
 <br />
 <div align="center">
   <a href="https://github.com/rconfig/-rconfig6-docker">
-    <img src="https://www.rconfig.com/images/new_logos/blue_logos/artwork_blue_horizontal_Artboard_1_96px.png" alt="Logo" >
+    <img src="https://www.rconfig.com/images/new_logos/red_logos/artwork_red_horizontalArtboard_1_96px.png" alt="Logo" >
   </a>
 
-  <h3 align="center">rConfig v6 Docker Compose Repository</h3>
+  <h3 align="center">rConfig v3 Docker Compose Repository</h3>
 
   <p align="center">
-    A repo for to setup containers for the purpose of running rConfig in Docker.
+    A repo for to setup containers for the purpose of running rConfig 3 in Docker.
     <br />
     <a href="https://www.rconfig.com/docs"><strong>Explore the docs »</strong></a>
     <br />
@@ -42,9 +42,11 @@ https://github.com/mohammadain/laravel-docker-cron/blob/master/Dockerfile -->
 
 ## Intro
 
-rConfig v6 is an enterprise grade Network Configuration Management (NCM) software package with superior NCM features and capabilities to help you easily manage configurations on large and small heterogenous networks. rConfig v6 is our flagship professional version of rCconfig aimed at high value networks and business operations. rConfig v6 runs nativley on many variants of Linux. Within this repo, we have developed docker compose files and related artifacts to allow our customers run rConfig v6 within a Docker environment.
+rConfig v3 is our free open source Network Configuration Management (NCM) software package with superior NCM features and capabilities to help you easily manage configurations on small and lab based heterogenous networks.
 
-Supported OS
+rConfig v6 is our flagship professional version of rConfig aimed at high value networks and business operations. rConfig v6 runs natively on many variants of Linux. Within this repo, we have developed docker compose files and related artifacts to allow our customers run rConfig v6 within a Docker environment.
+
+Supported OS for the docker files;
 
 - Rocky Linux 8.4+
 - RHEL Linux 8.4+
@@ -52,9 +54,9 @@ Supported OS
 
 These scripts are not tested on Docker Desktop or Docker for Windows at the time of this commit.
 
-Of course, you may download or clone these files, and edit as you see fit. But you will need an rConfig v6 professional license to download rConfig v6 code base. This is available over at rconfig.com.
+Of course, you may download or clone these files, and edit as you see fit.
 
-Check out our docs `www.rconfig.com/docs` to learn more.
+Check out our v3 docs `help.rconfig.com` to learn more.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -64,14 +66,14 @@ Check out our docs `www.rconfig.com/docs` to learn more.
 
 ## Installation
 
-We have made it super easy to get started with rConfig v6 on Docker. Follow the steps below to get started.
+We have made it super easy to get started with rConfig v3 on Docker. Follow the steps below to get started.
 
 ### Prerequisites
 
 Some prerequisites are needed before you get started.
 
 - OS
-  - Any latest version of CentOS, RHEL, Rocky or Ubunut
+  - Any latest version of CentOS, RHEL, Rocky or Ubunutu
 - Docker
   - Any latest version of Docker or Docker-CE
   - Any latest version of Docker Compose
@@ -89,13 +91,13 @@ Your OS will need `git` installed to clone this repo. Internet access for the ho
 
    ```sh
    cd /var/www/html
-   git clone https://github.com/rconfig/rconfig6-docker.git
+   git clone https://github.com/rconfig/rconfig3-docker.git
    ```
 
 2. Create top level .env file
 
    ```sh
-   cd rconfig6-docker
+   cd rconfig3-docker
    cp .env.example .env
    ```
 
@@ -106,63 +108,45 @@ Your OS will need `git` installed to clone this repo. Internet access for the ho
    ```
 
    ```sh
-   APP_URL=somehostname.yourdomain.com
-   APP_PORT=8080
-
-   DB_CONNECTION=mysql
-   DB_HOST=rconfig6-mariadb
-   DB_PORT=3306
-   DB_USERNAME=root
-   DB_PASSWORD=
-
-   RCONFIG_API_TOKEN=
-
-   #REDIS ENV CONFIG
-   REDIS_HOST=rconfig6-redis
-   REDIS_PASSWORD=null
-   REDIS_PORT=6379
+   MYSQL_USER=root
+   MYSQL_ROOT_PASSWORD=
+   MYSQL_PASSWORD=
+   MYSQL_DATABASE=tmpdatabase
+   MYSQL_PORT=3306
 
    #EXPOSED PORTS
    EXPOSED_APP_PORT=8080
+   EXPOSED_APP_HTTPS_PORT=4443
    EXPOSED_DB_PORT=3307
-   EXPOSED_HORIZON_PORT=8081
-   EXPOSED_REDIS_PORT=7000
+
    ```
 
-If you are uncertain about any of the above, the most important items to change are the DB_PASSWORD and the RCONFIG_API_TOKEN
+If you are uncertain about any of the above, the most important items to change are the MYSQL_ROOT_PASSWORD, DB_PASSWORD and EXPOSED_APP_PORT & EXPOSED_APP_HTTPS_PORT if they are already exposed on your host.
 
-4. Bring up the containers. THis time we remove the Horizon container from the build as the application init is not complete so will throw errors. (This will take a few minutes the first time)
+4. clone the rconfig applications files to the src directory
 
    ```sh
-   docker-compose up --scale horizon=0 -d --build
+   cd src
+   git clone https://github.com/rconfig/rconfig.git
    ```
 
-5. Once the comtainers are up and running with no errors from the previous output,
-   login to the php-apache container
+5. Bring up the containers. This time we remove the Horizon container from the build as the application init is not complete so will throw errors. (This will take a few minutes the first time)
+
+   ```sh
+   docker-compose up -d --build
+   ```
+
+6. Once the containers are up and running with no errors from the previous output we can follow the setup wizard to complete the installation. Navigate to http://yourhost:8080/install and follow the steps. The `Database Server` input field on the `Database Setup` page must always be `mariadb`.
+   Note: if the DB installation does not work, login to the php-apache container and apply the correct permissions per below.
 
    ```sh
    docker-compose exec php-apache /bin/bash
+   chwon -R 33 /home/rconfig
    ```
 
-6. Download envoy script
+7. When the setup wizard has completed successfully, login to the app by https. https://yourhostname:8443/login.php. You will encounter an SSL error, and you can skip this. It is a
 
-   ```sh
-   wget https://www.rconfig.com/downloads/rconfig6-docker-envoy.blade.php -O /var/www/html/rconfig6/Envoy.blade.php
-   ```
-
-7. Run the envoy init
-
-   ```sh
-   envoy run init --dbhost=$DB_HOST --dbuser=$DB_USERNAME --dbpass=$DB_PASSWORD --hostname=$APP_URL --apitoken=$RCONFIG_API_TOKEN
-   ```
-
-8. run the envoy deploy
-
-   ```sh
-   envoy run deploy --apitoken=$RCONFIG_API_TOKEN
-   ```
-
-9. Once the installation completes with no errors, exit the container, bring everything down, and start all containers up.
+8. Once the installation completes with no errors, exit the container, bring everything down, and start all containers up. You should hit the login page again to validate everything is working as expected.
 
    ```sh
    exit
@@ -170,16 +154,11 @@ If you are uncertain about any of the above, the most important items to change 
    docker-compose up -d --build
    ```
 
-10. your final output from the previous step should look like this
+9. your final output from the previous step should look like this
 
 ```sh
-[+] Running 6/6
-⠿ Network rconfig6-docker_rconfig6Network  Created       0.3s
-⠿ Container rconfig6-redis                 Started       0.6s
-⠿ Container rconfig6-mariadb               Started       0.7s
-⠿ Container rconfig6-php-apache            Started       1.1s
-⠿ Container rconfig6-horizon-supervisor    Started       1.6s
-⠿ Container rconfig6-cronjob               Started       1.6s
+Creating rconfig3-mariadb ... done
+Creating rconfig3-php-apache ... done
 ```
 
 When troubleshooting issues, the following commands are useful.
@@ -208,9 +187,9 @@ If you have permissions issues, such as errors that rConfig cannot write to the 
    www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
    ```
 
-4. Simply apply the correct permissions to the `persistentdata` directory
+4. Simply apply the correct permissions to the `/home/rconfig/` directory
    ```sh
-   chown -R 33 persistentdata/
+   chown -R 33 /home/rconfig/
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -221,9 +200,9 @@ If you have permissions issues, such as errors that rConfig cannot write to the 
 
 ## Usage
 
-The default port for the web app is 8080. So go ahead and login to yourhostname.domain.com:8080 with the rConfig default creds per the documentation.
+The default port for the web app is 8080. So go ahead and login to http://yourhostname.domain.com:8080/install with the rConfig default creds per the documentation for install wizard. When the install is complete the login url will be https://yourhostname.domain.com:8443/login.php
 
-_Please refer to the [Documentation](https://www.rconfig.com/docs)_
+_Please refer to the [Documentation](help.rconfig.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -262,4 +241,4 @@ This code base for this repository's code is distributed under the MIT License. 
 
 ## Support
 
-Although we provide this code free and open source, rConfig v6 is based on a professional subscription arrangement. You may open issues in the issue section here at githunb, but rConfig Professional subscribers should open a ticket via our normal support channels.
+Although we provide this code free and open source, rConfig v3 is only supported with a gold subscription from rConfig.com. You may raise issues in this or the main rConfig repository, but our support teams do not monitor those for support requests.

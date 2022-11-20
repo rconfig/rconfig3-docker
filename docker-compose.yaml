@@ -41,7 +41,7 @@ services:
     - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
-      - mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
     ports:
         - '${EXPOSED_DB_PORT}:3306'
     networks:
