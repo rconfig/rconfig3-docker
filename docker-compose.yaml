@@ -1,0 +1,51 @@
+version: "3.8"
+
+networks:
+  rconfig3Network:
+    driver: bridge
+
+services:
+  php-apache:
+    container_name: rconfig3-php-apache
+    volumes:
+      - "./src:/home/"
+    build:
+      dockerfile: ./php/Dockerfile
+      context: .
+    restart: always
+    ports:
+        - '${EXPOSED_APP_PORT}:80'
+        - '${EXPOSED_APP_HTTPS_PORT}:443'
+    stdin_open: true
+    tty: true
+    links:
+     - mariadb
+    depends_on:
+     - mariadb
+    environment:
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DATABASE}
+    - MYSQL_PORT=${MYSQL_PORT}
+    networks:
+    - rconfig3Network
+    
+  mariadb:
+    image: mariadb:10.3
+    container_name: rconfig3-mariadb
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+        - '${EXPOSED_DB_PORT}:3306'
+    networks:
+    - rconfig3Network
+
+volumes:
+  mysql:
