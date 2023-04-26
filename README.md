@@ -11,7 +11,7 @@ https://github.com/mohammadain/laravel-docker-cron/blob/master/Dockerfile -->
 <br />
 <div align="center">
   <a href="https://github.com/rconfig/rconfig3-docker">
-    <img src="https://www.rconfig.com/images/new_logos/red_logos/artwork_red_horizontalArtboard_1_96px.png" alt="Logo" >
+    <img src="https://www.rconfig.com/images/rConfig_logos/red_logos/artwork_red_horizontalArtboard_1_96px.png" alt="Logo" >
   </a>
 
   <h3 align="center">rConfig v3 Docker Compose Repository</h3>
